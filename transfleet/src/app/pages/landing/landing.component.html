@@ -1,0 +1,228 @@
+<!-- ===== NAVBAR ===== -->
+<nav class="nav">
+  <div class="nav-container">
+    <div class="nav-logo">
+      <lucide-icon [img]="icons.truck" class="logo-icon"></lucide-icon>
+      <span class="logo-text">TransFleet</span>
+    </div>
+    <div class="nav-links">
+      <a href="#features" class="nav-link">Fonctionnalités</a>
+      <a href="#stats" class="nav-link">Chiffres</a>
+      <a href="#testimonials" class="nav-link">Témoignages</a>
+    </div>
+    <div class="nav-actions">
+      <a routerLink="/login" class="btn btn-ghost">Se connecter</a>
+      <a routerLink="/register" class="btn btn-primary">Essai gratuit</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-blob blob-1"></div>
+    <div class="hero-blob blob-2"></div>
+    <div class="grid-overlay"></div>
+  </div>
+  <div class="hero-container">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      Nouveau — Suivi GPS intégré maintenant disponible
+    </div>
+    <h1 class="hero-title">
+      Pilotez votre flotte<br>
+      <span class="gradient-text">avec intelligence</span>
+    </h1>
+    <p class="hero-subtitle">
+      TransFleet centralise la gestion de vos véhicules, conducteurs et trajets
+      en une plateforme puissante et intuitive. Réduisez vos coûts, maximisez votre efficacité.
+    </p>
+    <div class="hero-actions">
+      <a routerLink="/login" class="btn btn-primary btn-lg">
+        Commencer gratuitement
+        <lucide-icon [img]="icons.arrowRight" class="btn-arrow"></lucide-icon>
+      </a>
+      <a href="#features" class="btn btn-outline btn-lg">
+        Découvrir les fonctionnalités
+      </a>
+    </div>
+    <div class="hero-trust">
+      <span class="trust-text">Déjà adopté par</span>
+      <div class="trust-logos">
+        <span class="trust-logo">Transport Express</span>
+        <span class="trust-sep">·</span>
+        <span class="trust-logo">Sahel Mobility</span>
+        <span class="trust-sep">·</span>
+        <span class="trust-logo">ABIDJAN FLEET</span>
+        <span class="trust-sep">·</span>
+        <span class="trust-logo">LogiPro</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard preview card -->
+  <div class="hero-visual">
+    <div class="dashboard-preview">
+      <div class="preview-header">
+        <div class="preview-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <span class="preview-title">TransFleet Dashboard</span>
+      </div>
+      <div class="preview-body">
+        <div class="preview-stats">
+          <div class="pstat">
+            <div class="pstat-value" style="color:#1a237e">24</div>
+            <div class="pstat-label">Véhicules actifs</div>
+          </div>
+          <div class="pstat">
+            <div class="pstat-value" style="color:#2e7d32">8</div>
+            <div class="pstat-label">Trajets en cours</div>
+          </div>
+          <div class="pstat">
+            <div class="pstat-value" style="color:#e65100">2</div>
+            <div class="pstat-label">Maintenances</div>
+          </div>
+        </div>
+        <div class="preview-map">
+          <div class="map-placeholder">
+            <lucide-icon [img]="icons.mapPin" class="map-icon" [size]="48"></lucide-icon>
+            <div class="map-pin pin-1"></div>
+            <div class="map-pin pin-2"></div>
+            <div class="map-pin pin-3"></div>
+            <div class="map-route"></div>
+          </div>
+        </div>
+        <div class="preview-list">
+          <div class="plist-item">
+            <span class="plist-dot green"></span>
+            <span>BA-123-CM — En transit</span>
+            <span class="plist-speed">87 km/h</span>
+          </div>
+          <div class="plist-item">
+            <span class="plist-dot blue"></span>
+            <span>LT-456-CM — Chargement</span>
+            <span class="plist-speed">0 km/h</span>
+          </div>
+          <div class="plist-item">
+            <span class="plist-dot orange"></span>
+            <span>DL-789-CM — Maintenance</span>
+            <span class="plist-speed">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STATS ===== -->
+<section class="stats-section" id="stats">
+  <div class="section-container">
+    <div class="stats-grid">
+      @for (stat of stats; track stat.label) {
+        <div class="stat-card">
+          <div class="stat-value">{{ stat.value }}</div>
+          <div class="stat-label">{{ stat.label }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section class="features-section" id="features">
+  <div class="section-container">
+    <div class="section-header">
+      <span class="section-badge">Fonctionnalités</span>
+      <h2 class="section-title">Tout ce dont votre flotte a besoin</h2>
+      <p class="section-subtitle">
+        Une suite complète d'outils pour gérer, optimiser et sécuriser votre parc automobile.
+      </p>
+    </div>
+    <div class="features-grid">
+      @for (feature of features; track feature.title) {
+        <div class="feature-card">
+          <lucide-icon [img]="icons[feature.icon]" class="feature-icon" [size]="36"></lucide-icon>
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-desc">{{ feature.description }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section class="testimonials-section" id="testimonials">
+  <div class="section-container">
+    <div class="section-header">
+      <span class="section-badge">Témoignages</span>
+      <h2 class="section-title">Ils nous font confiance</h2>
+    </div>
+    <div class="testimonials-grid">
+      @for (t of testimonials; track t.name) {
+        <div class="testimonial-card">
+          <lucide-icon [img]="icons.quote" class="testimonial-quote" [size]="32"></lucide-icon>
+          <p class="testimonial-text">{{ t.quote }}</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">{{ t.name.charAt(0) }}</div>
+            <div class="author-info">
+              <div class="author-name">{{ t.name }}</div>
+              <div class="author-role">{{ t.role }} — {{ t.company }}</div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta-section">
+  <div class="section-container">
+    <div class="cta-card">
+      <div class="cta-blob"></div>
+      <h2 class="cta-title">Prêt à optimiser votre flotte ?</h2>
+      <p class="cta-subtitle">Démarrez gratuitement, sans carte bancaire. Accès complet pendant 14 jours.</p>
+      <div class="cta-actions">
+        <a routerLink="/register" class="btn btn-white btn-lg">
+          Démarrer l'essai gratuit
+          <lucide-icon [img]="icons.arrowRight"></lucide-icon>
+        </a>
+        <a routerLink="/login" class="btn btn-ghost-white btn-lg">Se connecter</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="section-container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="nav-logo">
+          <lucide-icon [img]="icons.truck" class="logo-icon" style="color:white"></lucide-icon>
+          <span class="logo-text" style="color:white">TransFleet</span>
+        </div>
+        <p class="footer-tagline">La plateforme de gestion de flotte<br>pensée pour l'Afrique et au-delà.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <div class="footer-col-title">Produit</div>
+          <a href="#features">Fonctionnalités</a>
+          <a href="#stats">Chiffres</a>
+          <a routerLink="/login">Connexion</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Support</div>
+          <a href="#">Documentation</a>
+          <a href="#">Contact</a>
+          <a href="#">FAQ</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 TransFleet. Tous droits réservés.</span>
+      <span>v{{ version }}</span>
+    </div>
+  </div>
+</footer>
