@@ -29,19 +29,20 @@ interface AlertRow {
 export class DashboardComponent implements OnInit, OnDestroy {
 
   private authService = inject(AuthService);
+  alerts: any[] = [];
 
   // ── Auth state from real AuthService signals ──────────────────────────
   currentUser = this.authService.currentUser;
   userRole    = this.authService.userRole;
 
   displayName = computed(() => {
-    const u = this.currentUser();
+    const u = this.currentUser() as any;
     if (!u) return 'Utilisateur';
     return `${u.prenom} ${u.nom.charAt(0)}.`;
   });
 
   userInitials = computed(() => {
-    const u = this.currentUser();
+    const u = this.currentUser() as any;
     if (!u) return '?';
     return `${u.prenom.charAt(0)}${u.nom.charAt(0)}`.toUpperCase();
   });
