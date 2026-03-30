@@ -1,0 +1,14 @@
+# ── Stage 1 : Build Angular ────────────────────────────────────────────────────
+FROM node:20-alpine AS frontend-builder
+WORKDIR /app
+COPY frontend/package*.json ./
+RUN npm ci --prefer-offline
+COPY frontend/ .
+RUN npx ng build --configuration=production
+
+# ── Stage 2 : Runtime Nginx ────────────────────────────────────────────────────
+FROM nginx:1.27-alpine AS frontend
+COPY --from=frontend-builder /app/dist/transflet/browser /usr/share/nginx/html
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

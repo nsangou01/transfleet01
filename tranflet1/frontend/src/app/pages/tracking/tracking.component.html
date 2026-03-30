@@ -1,0 +1,34 @@
+<div class="page">
+  <div class="page-header">
+    <div><h1>Suivi GPS</h1><p class="subtitle">Positions en temps réel (actualisation toutes les 30s)</p></div>
+    <div class="header-actions">
+      <span class="badge badge-scheduled">{{ lastUpdate() }}</span>
+      <button class="btn btn-secondary" (click)="load()">Actualiser</button>
+    </div>
+  </div>
+  @if (loading()) { <div class="loading-state">Chargement…</div> }
+  <div class="tracking-grid">
+    @for (item of data(); track item.vehicle.id) {
+      <div class="tracking-card" [class]="'status-' + item.vehicle.status">
+        <div class="tc-header">
+          <div class="tc-plate">{{ item.vehicle.plate }}</div>
+          <span class="badge" [class]="'badge-' + item.vehicle.status">{{ statusLabel(item.vehicle.status) }}</span>
+        </div>
+        <div class="tc-vehicle">{{ item.vehicle.brand }} {{ item.vehicle.model }}</div>
+        @if (item.lastPosition) {
+          <div class="tc-info">
+            <div class="tc-row"><span>Latitude</span><strong>{{ item.lastPosition.latitude }}</strong></div>
+            <div class="tc-row"><span>Longitude</span><strong>{{ item.lastPosition.longitude }}</strong></div>
+            <div class="tc-row"><span>Vitesse</span><strong>{{ item.lastPosition.speed ?? 0 }} km/h</strong></div>
+            <div class="tc-row"><span>Moteur</span><strong>{{ item.lastPosition.engine_status === "on" ? "En marche" : "Arrêté" }}</strong></div>
+            <div class="tc-row"><span>Kilométrage</span><strong>{{ (item.lastPosition.mileage ?? 0).toLocaleString() }} km</strong></div>
+            <div class="tc-row"><span>Dernière mise à jour</span><strong>{{ item.lastPosition.recorded_at | date:"dd/MM HH:mm:ss" }}</strong></div>
+          </div>
+          <a [href]="mapUrl(item.lastPosition)" target="_blank" class="btn btn-secondary btn-sm">Voir sur Google Maps</a>
+        } @else {
+          <div class="tc-no-data">Aucune donnée GPS disponible</div>
+        }
+      </div>
+    }
+  </div>
+</div>

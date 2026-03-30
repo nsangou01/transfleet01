@@ -1,0 +1,85 @@
+<div class="page">
+  <div class="page-header">
+    <div><h1>Notifications</h1><p class="subtitle">{{ unread() }} non lue(s)</p></div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="markAll()" [disabled]="unread() === 0">Tout marquer lu</button>
+      @if (isManager()) { <button class="btn btn-primary" (click)="showModal.set(true)">+ Envoyer</button> }
+    </div>
+  </div>
+  <div class="filters">
+    <select [(ngModel)]="filterRead" (change)="load()" class="filter-select">
+      <option value="">Toutes</option>
+      <option value="false">Non lues</option>
+      <option value="true">Lues</option>
+    </select>
+  </div>
+  @if (loading()) { <div class="loading-state">Chargement…</div> }
+  <div class="notif-list">
+    @for (n of notifs(); track n.id) {
+      <div class="notif-item" [class.unread]="!n.is_read" [ngClass]="'notif-' + n.type">
+        <div class="notif-icon"></div>
+        <div class="notif-body">
+          <div class="notif-title">{{ n.title }}</div>
+          <div class="notif-message">{{ n.message }}</div>
+          <div class="notif-meta">{{ n.created_at | date:'dd/MM/yyyy HH:mm' }}</div>
+        </div>
+        <div class="notif-actions">
+          @if (!n.is_read) {
+            <button class="btn-icon-sm success" title="Marquer lu" (click)="markOne(n)">Lu</button>
+          }
+          @if (isManager()) {
+            <button class="btn-icon-sm danger" title="Supprimer" (click)="del(n)">Suppr</button>
+          }
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-state">Aucune notification.</div>
+    }
+  </div>
+
+  @if (showModal()) {
+    <div class="modal-backdrop" (click)="showModal.set(false)">
+      <div class="modal modal-sm" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Envoyer une notification</h2>
+          <button class="modal-close" (click)="showModal.set(false)">X</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="field">
+              <label>Type</label>
+              <select [(ngModel)]="form['type']">
+                <option value="info">Information</option>
+                <option value="success">Succès</option>
+                <option value="warning">Avertissement</option>
+                <option value="alert">Alerte</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Destinataires</label>
+              <select [(ngModel)]="form['target_role']">
+                <option value="all">Tous</option>
+                <option value="manager">Gestionnaires</option>
+                <option value="driver">Conducteurs</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Titre *</label>
+              <input [(ngModel)]="form['title']" />
+            </div>
+            <div class="field">
+              <label>Message *</label>
+              <textarea [(ngModel)]="form['message']" rows="4"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="showModal.set(false)">Annuler</button>
+          <button class="btn btn-primary" (click)="send()" [disabled]="sending()">
+            {{ sending() ? 'Envoi…' : 'Envoyer' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

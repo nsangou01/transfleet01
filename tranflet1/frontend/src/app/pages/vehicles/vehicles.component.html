@@ -1,0 +1,143 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Véhicules</h1>
+      <p class="subtitle">Gestion du parc automobile TRANSIMEX</p>
+    </div>
+    <button class="btn btn-primary" (click)="openModal()">+ Ajouter un véhicule</button>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters">
+    <input type="text" [(ngModel)]="search" (input)="load()" placeholder="Rechercher (plaque, marque, modèle)…" class="search-input" />
+    <select [(ngModel)]="filterStatus" (change)="load()" class="filter-select">
+      <option value="">Tous les statuts</option>
+      <option value="available">Disponible</option>
+      <option value="in_use">En route</option>
+      <option value="maintenance">Maintenance</option>
+      <option value="out_of_service">Hors service</option>
+    </select>
+  </div>
+
+  @if (loading()) { <div class="loading-state">Chargement…</div> }
+
+  <!-- Table -->
+  @if (!loading()) {
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Plaque</th><th>Véhicule</th><th>Carburant</th>
+            <th>Kilométrage</th><th>Statut</th><th>Conducteur</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (v of vehicles(); track v.id) {
+            <tr>
+              <td><strong>{{ v.plate }}</strong></td>
+              <td>{{ v.brand }} {{ v.model }} ({{ v.year }})</td>
+              <td>{{ fuelLabel(v.fuel_type) }}</td>
+              <td>{{ v.mileage.toLocaleString() }} km</td>
+              <td><span class="badge" [class]="'badge-' + v.status">{{ statusLabel(v.status) }}</span></td>
+              <td>{{ v.assignedDriver?.user ? v.assignedDriver!.user!.first_name + ' ' + v.assignedDriver!.user!.last_name : '—' }}</td>
+              <td class="actions">
+                <button class="btn-icon-sm" title="Modifier" (click)="openModal(v)">Modifier</button>
+                <button class="btn-icon-sm danger" title="Supprimer" (click)="confirmDelete(v)">Supprimer</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="7" class="empty">Aucun véhicule trouvé.</td></tr>
+          }
+        </tbody>
+      </table>
+      <div class="table-footer">Total : {{ total() }} véhicule(s)</div>
+    </div>
+  }
+
+  <!-- Modal -->
+  @if (showModal()) {
+    <div class="modal-backdrop" (click)="closeModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ editing() ? 'Modifier le véhicule' : 'Nouveau véhicule' }}</h2>
+          <button class="modal-close" (click)="closeModal()">X</button>
+        </div>
+        <div class="modal-body">
+          @if (formError()) { <div class="alert-error">{{ formError() }}</div> }
+          <div class="form-grid">
+            <div class="field">
+              <label>Plaque d'immatriculation *</label>
+              <input [(ngModel)]="form.plate" placeholder="LT-XXXX-X" />
+            </div>
+            <div class="field">
+              <label>Marque *</label>
+              <input [(ngModel)]="form.brand" placeholder="Toyota, Mercedes…" />
+            </div>
+            <div class="field">
+              <label>Modèle *</label>
+              <input [(ngModel)]="form.model" placeholder="Hilux, Sprinter…" />
+            </div>
+            <div class="field">
+              <label>Année *</label>
+              <input type="number" [(ngModel)]="form.year" min="2000" max="2030" />
+            </div>
+            <div class="field">
+              <label>Type de carburant</label>
+              <select [(ngModel)]="form.fuel_type">
+                <option value="diesel">Diesel</option>
+                <option value="gasoline">Essence</option>
+                <option value="hybrid">Hybride</option>
+                <option value="electric">Électrique</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Capacité (places)</label>
+              <input type="number" [(ngModel)]="form.capacity" min="1" max="50" />
+            </div>
+            <div class="field">
+              <label>Kilométrage actuel</label>
+              <input type="number" [(ngModel)]="form.mileage" min="0" />
+            </div>
+            <div class="field">
+              <label>Couleur</label>
+              <input [(ngModel)]="form.color" placeholder="Blanc, Gris…" />
+            </div>
+            <div class="field">
+              <label>N° châssis (VIN)</label>
+              <input [(ngModel)]="form.vin" placeholder="17 caractères" />
+            </div>
+            <div class="field">
+              <label>Date d'achat</label>
+              <input type="date" [(ngModel)]="form.purchase_date" />
+            </div>
+            <div class="field">
+              <label>Expiration assurance</label>
+              <input type="date" [(ngModel)]="form.insurance_expiry" />
+            </div>
+            <div class="field">
+              <label>Expiration visite technique</label>
+              <input type="date" [(ngModel)]="form.inspection_expiry" />
+            </div>
+            @if (editing()) {
+              <div class="field">
+                <label>Statut</label>
+                <select [(ngModel)]="form.status">
+                  <option value="available">Disponible</option>
+                  <option value="in_use">En route</option>
+                  <option value="maintenance">Maintenance</option>
+                  <option value="out_of_service">Hors service</option>
+                </select>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeModal()">Annuler</button>
+          <button class="btn btn-primary" (click)="save()" [disabled]="saving()">
+            {{ saving() ? 'Enregistrement…' : (editing() ? 'Modifier' : 'Ajouter') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

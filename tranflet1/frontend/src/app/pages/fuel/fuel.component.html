@@ -1,0 +1,79 @@
+<div class="page">
+  <div class="page-header">
+    <div><h1>Carburant</h1><p class="subtitle">Suivi de la consommation</p></div>
+    <button class="btn btn-primary" (click)="openModal()">+ Saisir ravitaillement</button>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi-sm"><span>Total mois</span><strong>{{ totalCost().toLocaleString() }} FCFA</strong></div>
+    <div class="kpi-sm"><span>Volume total</span><strong>{{ totalQty() }} L</strong></div>
+    <div class="kpi-sm"><span>Nombre d'opérations</span><strong>{{ total() }}</strong></div>
+  </div>
+  @if (loading()) { <div class="loading-state">Chargement…</div> }
+  @if (!loading()) {
+    <div class="table-card">
+      <table>
+        <thead><tr><th>Date</th><th>Véhicule</th><th>Conducteur</th><th>Station</th><th>Qté (L)</th><th>Prix/L</th><th>Total FCFA</th><th>Actions</th></tr></thead>
+        <tbody>
+          @for (f of records(); track f.id) {
+            <tr>
+              <td>{{ f.date }}</td>
+              <td>{{ f.vehicle?.plate }} – {{ f.vehicle?.brand }}</td>
+              <td>{{ f.driver?.user?.first_name }} {{ f.driver?.user?.last_name }}</td>
+              <td>{{ f.station_name ?? "—" }}, {{ f.station_city ?? "" }}</td>
+              <td>{{ f.quantity }}</td>
+              <td>{{ f.price_per_litre.toLocaleString() }}</td>
+              <td><strong>{{ f.total_cost.toLocaleString() }}</strong></td>
+              <td class="actions">
+                <button class="btn-icon-sm" (click)="openModal(f)">Modifier</button>
+                <button class="btn-icon-sm danger" (click)="del(f)">Supprimer</button>
+              </td>
+            </tr>
+          } @empty { <tr><td colspan="8" class="empty">Aucun enregistrement.</td></tr> }
+        </tbody>
+      </table>
+      <div class="table-footer">{{ total() }} enregistrement(s)</div>
+    </div>
+  }
+  @if (showModal()) {
+    <div class="modal-backdrop" (click)="closeModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header"><h2>{{ editing() ? "Modifier" : "Nouveau ravitaillement" }}</h2><button class="modal-close" (click)="closeModal()">X</button></div>
+        <div class="modal-body">
+          @if (formError()) { <div class="alert-error">{{ formError() }}</div> }
+          <div class="form-grid">
+            <div class="field"><label>Véhicule *</label>
+              <select [(ngModel)]="form.vehicle_id">
+                <option value="">-- Sélectionner --</option>
+                @for (v of vehicles(); track v.id) { <option [value]="v.id">{{ v.plate }} – {{ v.brand }}</option> }
+              </select>
+            </div>
+            <div class="field"><label>Conducteur *</label>
+              <select [(ngModel)]="form.driver_id">
+                <option value="">-- Sélectionner --</option>
+                @for (d of drivers(); track d.id) { <option [value]="d.id">{{ d.user?.first_name }} {{ d.user?.last_name }}</option> }
+              </select>
+            </div>
+            <div class="field"><label>Date *</label><input type="date" [(ngModel)]="form.date" /></div>
+            <div class="field"><label>Type carburant</label>
+              <select [(ngModel)]="form.fuel_type">
+                <option value="diesel">Diesel</option><option value="gasoline">Essence</option>
+                <option value="hybrid">Hybride</option><option value="electric">Électrique</option>
+              </select>
+            </div>
+            <div class="field"><label>Quantité (L) *</label><input type="number" [(ngModel)]="form.quantity" (input)="calcTotal()" /></div>
+            <div class="field"><label>Prix/Litre (FCFA) *</label><input type="number" [(ngModel)]="form.price_per_litre" (input)="calcTotal()" /></div>
+            <div class="field"><label>Total FCFA</label><input type="number" [(ngModel)]="form.total_cost" readonly /></div>
+            <div class="field"><label>Station</label><input [(ngModel)]="form.station_name" placeholder="Total, Tradex…" /></div>
+            <div class="field"><label>Ville</label><input [(ngModel)]="form.station_city" placeholder="Douala, Yaoundé…" /></div>
+            <div class="field"><label>Kilométrage au ravitaillement</label><input type="number" [(ngModel)]="form.mileage_at_fill" /></div>
+            <div class="field"><label>Notes</label><textarea [(ngModel)]="form.notes" rows="2"></textarea></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeModal()">Annuler</button>
+          <button class="btn btn-primary" (click)="save()" [disabled]="saving()">{{ saving() ? "…" : (editing() ? "Modifier" : "Enregistrer") }}</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

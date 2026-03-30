@@ -1,0 +1,80 @@
+<div class="page">
+  <div class="page-header">
+    <div><h1>Maintenance</h1><p class="subtitle">Planification et suivi des entretiens</p></div>
+    <button class="btn btn-primary" (click)="openModal()">+ Planifier une maintenance</button>
+  </div>
+  <div class="filters">
+    <select [(ngModel)]="filterStatus" (change)="load()" class="filter-select">
+      <option value="">Tous</option><option value="scheduled">Planifié</option>
+      <option value="in_progress">En cours</option><option value="completed">Terminé</option><option value="cancelled">Annulé</option>
+    </select>
+  </div>
+  @if (loading()) { <div class="loading-state">Chargement…</div> }
+  @if (!loading()) {
+    <div class="table-card">
+      <table>
+        <thead><tr><th>Véhicule</th><th>Type</th><th>Description</th><th>Date prévue</th><th>Statut</th><th>Coût estimé</th><th>Prestataire</th><th>Actions</th></tr></thead>
+        <tbody>
+          @for (m of records(); track m.id) {
+            <tr>
+              <td>{{ m.vehicle?.plate }} – {{ m.vehicle?.brand }}</td>
+              <td>{{ typeLabel(m.type) }}</td>
+              <td>{{ m.description }}</td>
+              <td>{{ m.scheduled_date }}</td>
+              <td><span class="badge" [class]="'badge-' + m.status">{{ statusLabel(m.status) }}</span></td>
+              <td>{{ m.estimated_cost ? m.estimated_cost.toLocaleString() + " F" : "—" }}</td>
+              <td>{{ m.provider ?? "—" }}</td>
+              <td class="actions">
+                <button class="btn-icon-sm" (click)="openModal(m)">Modifier</button>
+                <button class="btn-icon-sm danger" (click)="del(m)">Supprimer</button>
+              </td>
+            </tr>
+          } @empty { <tr><td colspan="8" class="empty">Aucune maintenance.</td></tr> }
+        </tbody>
+      </table>
+      <div class="table-footer">{{ total() }} enregistrement(s)</div>
+    </div>
+  }
+  @if (showModal()) {
+    <div class="modal-backdrop" (click)="closeModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header"><h2>{{ editing() ? "Modifier" : "Nouvelle maintenance" }}</h2><button class="modal-close" (click)="closeModal()">X</button></div>
+        <div class="modal-body">
+          @if (formError()) { <div class="alert-error">{{ formError() }}</div> }
+          <div class="form-grid">
+            <div class="field"><label>Véhicule *</label>
+              <select [(ngModel)]="form.vehicle_id">
+                <option value="">-- Sélectionner --</option>
+                @for (v of vehicles(); track v.id) { <option [value]="v.id">{{ v.plate }} – {{ v.brand }} {{ v.model }}</option> }
+              </select>
+            </div>
+            <div class="field"><label>Type *</label>
+              <select [(ngModel)]="form.type">
+                <option value="routine">Routine</option><option value="repair">Réparation</option>
+                <option value="inspection">Inspection</option><option value="emergency">Urgence</option>
+              </select>
+            </div>
+            <div class="field"><label>Description *</label><textarea [(ngModel)]="form.description" rows="3"></textarea></div>
+            <div class="field"><label>Date prévue *</label><input type="date" [(ngModel)]="form.scheduled_date" /></div>
+            <div class="field"><label>Statut</label>
+              <select [(ngModel)]="form.status">
+                <option value="scheduled">Planifié</option><option value="in_progress">En cours</option>
+                <option value="completed">Terminé</option><option value="cancelled">Annulé</option>
+              </select>
+            </div>
+            <div class="field"><label>Coût estimé (FCFA)</label><input type="number" [(ngModel)]="form.estimated_cost" /></div>
+            <div class="field"><label>Coût réel (FCFA)</label><input type="number" [(ngModel)]="form.actual_cost" /></div>
+            <div class="field"><label>Prestataire</label><input [(ngModel)]="form.provider" /></div>
+            <div class="field"><label>Téléphone prestataire</label><input [(ngModel)]="form.provider_phone" /></div>
+            <div class="field"><label>Date de fin réelle</label><input type="date" [(ngModel)]="form.completed_date" /></div>
+            <div class="field"><label>Notes</label><textarea [(ngModel)]="form.notes" rows="2"></textarea></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeModal()">Annuler</button>
+          <button class="btn btn-primary" (click)="save()" [disabled]="saving()">{{ saving() ? "…" : (editing() ? "Modifier" : "Planifier") }}</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

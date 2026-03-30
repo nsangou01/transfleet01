@@ -1,0 +1,83 @@
+<div class="page">
+  <div class="page-header">
+    <div><h1>Conducteurs</h1><p class="subtitle">Gestion des conducteurs TRANSIMEX</p></div>
+    <button class="btn btn-primary" (click)="openModal()">+ Ajouter un conducteur</button>
+  </div>
+  <div class="filters">
+    <input [(ngModel)]="search" (input)="load()" placeholder="Rechercher…" class="search-input" />
+    <select [(ngModel)]="filterStatus" (change)="load()" class="filter-select">
+      <option value="">Tous les statuts</option>
+      <option value="available">Disponible</option>
+      <option value="on_trip">En mission</option>
+      <option value="off_duty">Hors service</option>
+      <option value="suspended">Suspendu</option>
+    </select>
+  </div>
+  @if (loading()) { <div class="loading-state">Chargement…</div> }
+  @if (!loading()) {
+    <div class="table-card">
+      <table>
+        <thead><tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Permis</th><th>Expérience</th><th>Note</th><th>Trajets</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody>
+          @for (d of drivers(); track d.id) {
+            <tr>
+              <td><strong>{{ d.user?.first_name }} {{ d.user?.last_name }}</strong></td>
+              <td>{{ d.user?.email }}</td>
+              <td>{{ d.user?.phone ?? "—" }}</td>
+              <td>{{ d.license_number }}</td>
+              <td>{{ d.experience_years }} an(s)</td>
+              <td> {{ d.avg_rating }}</td>
+              <td>{{ d.total_trips }}</td>
+              <td><span class="badge" [class]="'badge-' + d.status">{{ statusLabel(d.status) }}</span></td>
+              <td class="actions">
+                <button class="btn-icon-sm" (click)="openModal(d)">Modifier</button>
+                <button class="btn-icon-sm" (click)="resetPassword(d)" title="Réinitialiser le mot de passe">Reset MDP</button>
+                <button class="btn-icon-sm danger" (click)="confirmDelete(d)">Supprimer</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="9" class="empty">Aucun conducteur trouvé.</td></tr>
+          }
+        </tbody>
+      </table>
+      <div class="table-footer">Total : {{ total() }} conducteur(s)</div>
+    </div>
+  }
+  @if (showModal()) {
+    <div class="modal-backdrop" (click)="closeModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header"><h2>{{ editing() ? "Modifier" : "Nouveau conducteur" }}</h2><button class="modal-close" (click)="closeModal()">X</button></div>
+        <div class="modal-body">
+          @if (formError()) { <div class="alert-error">{{ formError() }}</div> }
+          <div class="form-grid">
+            <div class="field"><label>Prénom *</label><input [(ngModel)]="form.first_name" /></div>
+            <div class="field"><label>Nom *</label><input [(ngModel)]="form.last_name" /></div>
+            <div class="field"><label>Email *</label><input type="email" [(ngModel)]="form.email" [disabled]="!!editing()" /></div>
+            <div class="field"><label>Téléphone</label><input [(ngModel)]="form.phone" /></div>
+            @if (!editing()) {
+              <div class="field"><label>Mot de passe *</label><input type="password" [(ngModel)]="form.password" /></div>
+            }
+            <div class="field"><label>N° Permis *</label><input [(ngModel)]="form.license_number" /></div>
+            <div class="field"><label>Catégorie permis</label><input [(ngModel)]="form.license_category" placeholder="B, C, D…" /></div>
+            <div class="field"><label>Expiration permis *</label><input type="date" [(ngModel)]="form.license_expiry" /></div>
+            <div class="field"><label>Années d'expérience</label><input type="number" [(ngModel)]="form.experience_years" min="0" /></div>
+            <div class="field"><label>Contact urgence</label><input [(ngModel)]="form.emergency_contact" /></div>
+            <div class="field"><label>Téléphone urgence</label><input [(ngModel)]="form.emergency_phone" /></div>
+            @if (editing()) {
+              <div class="field"><label>Statut</label>
+                <select [(ngModel)]="form.status">
+                  <option value="available">Disponible</option><option value="on_trip">En mission</option>
+                  <option value="off_duty">Hors service</option><option value="suspended">Suspendu</option>
+                </select>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeModal()">Annuler</button>
+          <button class="btn btn-primary" (click)="save()" [disabled]="saving()">{{ saving() ? "Enregistrement…" : (editing() ? "Modifier" : "Ajouter") }}</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

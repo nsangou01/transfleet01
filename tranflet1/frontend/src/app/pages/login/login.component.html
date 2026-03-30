@@ -1,0 +1,41 @@
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="logo">LOGO</div>
+      <h1>TRANSFLET</h1>
+      <p>Système de Gestion de Flotte<br><strong>TRANSIMEX S.A</strong></p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="login-form">
+      @if (error()) {
+        <div class="alert-error">{{ error() }}</div>
+      }
+
+      <div class="field">
+        <label>Adresse e-mail</label>
+        <input type="email" [(ngModel)]="email" name="email"
+               placeholder="votre@email.cm" required autocomplete="username" />
+      </div>
+
+      <div class="field">
+        <label>Mot de passe</label>
+        <div class="input-pw">
+          <input [type]="showPw() ? 'text' : 'password'" [(ngModel)]="password"
+                 name="password" placeholder="••••••••" required autocomplete="current-password" />
+          <button type="button" class="pw-toggle" (click)="showPw.update(v => !v)">{{ showPw() ? 'Masquer' : 'Voir' }}</button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-login" [disabled]="loading()">
+        @if (loading()) { <span class="spinner"></span> Connexion… }
+        @else { Se connecter }
+      </button>
+    </form>
+
+    <div class="demo-accounts">
+      <p>Comptes de démonstration :</p>
+      <button type="button" class="demo-btn" (click)="fillDemo('manager')">Gestionnaire</button>
+      <button type="button" class="demo-btn" (click)="fillDemo('driver')">Conducteur</button>
+    </div>
+  </div>
+</div>

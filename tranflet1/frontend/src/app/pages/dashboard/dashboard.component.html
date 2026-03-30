@@ -1,0 +1,114 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Tableau de bord</h1>
+      <p class="subtitle">Vue d'ensemble de la flotte TRANSIMEX</p>
+    </div>
+    <button class="btn btn-secondary" (click)="load()">Actualiser</button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">Chargement…</div>
+  }
+
+  @if (stats(); as s) {
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon vehicles"></div>
+        <div class="kpi-body">
+          <div class="kpi-value">{{ s.vehicles.total }}</div>
+          <div class="kpi-label">Véhicules totaux</div>
+          <div class="kpi-detail">
+            <span class="chip green">{{ s.vehicles.available ?? 0 }} dispos</span>
+            <span class="chip blue">{{ s.vehicles.in_use ?? 0 }} en route</span>
+            <span class="chip orange">{{ s.vehicles.maintenance ?? 0 }} maint.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon drivers"></div>
+        <div class="kpi-body">
+          <div class="kpi-value">{{ s.drivers.total }}</div>
+          <div class="kpi-label">Conducteurs</div>
+          <div class="kpi-detail">
+            <span class="chip green">{{ s.drivers.available ?? 0 }} dispos</span>
+            <span class="chip blue">{{ s.drivers.on_trip ?? 0 }} en mission</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon trips"></div>
+        <div class="kpi-body">
+          <div class="kpi-value">{{ s.trips.total }}</div>
+          <div class="kpi-label">Trajets totaux</div>
+          <div class="kpi-detail">
+            <span class="chip blue">{{ s.trips.in_progress ?? 0 }} en cours</span>
+            <span class="chip green">{{ s.trips.completed ?? 0 }} terminés</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon fuel"></div>
+        <div class="kpi-body">
+          <div class="kpi-value">{{ s.fuel?.monthCost ? (s.fuel.monthCost / 1000 | number:'1.0-0') : 0 }}K</div>
+          <div class="kpi-label">Coût carburant (FCFA)</div>
+          <div class="kpi-detail">
+            <span class="chip orange">Aujourd'hui : {{ s.fuel?.todayCost?.toLocaleString() ?? 0 }} F</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Maintenance alerts -->
+    @if (s.maintenance.pending > 0) {
+      <div class="section">
+        <div class="section-header">
+          <h2>Maintenances en attente ({{ s.maintenance.pending }})</h2>
+          <a routerLink="/maintenance" class="link">Voir tout →</a>
+        </div>
+        <div class="alert-list">
+          @for (m of s.maintenance.records; track m.id) {
+            <div class="alert-item" [class.urgent]="m.status === 'in_progress'">
+              <div class="alert-icon"></div>
+              <div class="alert-body">
+                <strong>{{ m.description }}</strong>
+                <span>Prévu le {{ m.scheduled_date | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <span class="badge" [class]="'badge-' + m.status">{{ statusLabel(m.status) }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Quick actions -->
+    <div class="section">
+      <h2>Actions rapides</h2>
+      <div class="quick-actions">
+        <a routerLink="/trips" class="action-card">
+          <span>Nouveau trajet</span>
+        </a>
+        <a routerLink="/vehicles" class="action-card">
+          <span>Gérer les véhicules</span>
+        </a>
+        <a routerLink="/fuel" class="action-card">
+          <span>Saisir carburant</span>
+        </a>
+        <a routerLink="/notifications" class="action-card">
+          <span>Notifications</span>
+        </a>
+      </div>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-state">
+      {{ error() }}
+      <button class="btn btn-secondary" (click)="load()">Réessayer</button>
+    </div>
+  }
+</div>

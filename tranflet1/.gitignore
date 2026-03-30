@@ -1,0 +1,25 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# Angular
+frontend/.angular/
+frontend/dist/
+frontend/out-tsc/
+
+# Env
+backend/.env
+!backend/.env.example
+
+# Uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+.idea/

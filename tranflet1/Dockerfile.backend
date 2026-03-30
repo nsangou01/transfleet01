@@ -1,0 +1,16 @@
+FROM node:20-alpine
+WORKDIR /app
+
+# Dépendances
+COPY backend/package*.json ./
+RUN npm ci --only=production
+
+# Code source
+COPY backend/ .
+
+# Dossier uploads
+RUN mkdir -p uploads && chown node:node uploads
+
+USER node
+EXPOSE 5000
+CMD ["node", "server.js"]

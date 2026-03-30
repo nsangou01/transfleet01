@@ -1,0 +1,71 @@
+<div class="layout" [class.sidebar-collapsed]="!sidebarOpen()">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-text">TRANSFLET</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of visibleItems(); track item.route) {
+        <a [routerLink]="item.route"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+           class="nav-item">
+          <span class="nav-label">{{ item.label }}</span>
+          @if (item.route === '/notifications' && unreadCount() > 0) {
+            <span class="badge-count">{{ unreadCount() }}</span>
+          }
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="version">v1.0.0 – TRANSIMEX</span>
+    </div>
+  </aside>
+
+  <!-- ── Main content ──────────────────────────────────────────────────────── -->
+  <div class="main-wrapper">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="btn-icon sidebar-toggle" (click)="toggleSidebar()" title="Menu">
+        <span>Menu</span>
+      </button>
+
+      <div class="topbar-right">
+        <!-- Notifications bell -->
+        <a routerLink="/notifications" class="btn-icon notif-btn" title="Notifications">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          @if (unreadCount() > 0) {
+            <span class="notif-badge">{{ unreadCount() }}</span>
+          }
+        </a>
+
+        <!-- User menu -->
+        <div class="user-menu" (click)="toggleUserMenu()" (clickOutside)="closeUserMenu()">
+          <div class="avatar">{{ initials() }}</div>
+          <div class="user-info">
+            <span class="user-name">{{ user()?.firstName }} {{ user()?.lastName }}</span>
+            <span class="user-role">{{ user()?.role }}</span>
+          </div>
+          <span class="chevron">v</span>
+
+          @if (userMenuOpen()) {
+            <div class="dropdown-menu">
+              <a routerLink="/notifications" class="dropdown-item" (click)="closeUserMenu()">Notifications</a>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item danger" (click)="logout()">Déconnexion</button>
+            </div>
+          }
+        </div>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <main class="page-content">
+      <router-outlet />
+    </main>
+  </div>
+</div>
