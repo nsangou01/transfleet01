@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { User, LoginResponse } from '../models';
+import { User } from '../models';
 
 interface ApiLoginResponse {
   token: string;
@@ -26,6 +26,10 @@ export class AuthService {
   private router = inject(Router);
   private api    = `${environment.apiUrl}/auth`;
 
+  // Utilisation des clés constantes pour éviter les erreurs de frappe
+  private readonly TOKEN_KEY = 'moni_token';
+  private readonly USER_KEY  = 'moni_user';
+
   private _user = signal<User | null>(this.loadUser());
   readonly currentUser  = this._user.asReadonly();
   readonly isLoggedIn   = computed(() => !!this._user());
@@ -34,13 +38,18 @@ export class AuthService {
   readonly passwordIsDefault = computed(() => this._user()?.passwordIsDefault ?? false);
 
   private loadUser(): User | null {
-    try { return JSON.parse(localStorage.getItem('moni_user') || 'null'); } catch { return null; }
+    try {
+      const savedUser = localStorage.getItem(this.USER_KEY);
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
   }
 
   login(email: string, password: string): Observable<ApiLoginResponse> {
     return this.http.post<ApiLoginResponse>(`${this.api}/login`, { email, password }).pipe(
       tap(res => {
-        // Mapper snake_case → camelCase
+        // 1. On prépare l'objet User (mapping snake_case vers camelCase)
         const user: User = {
           id: res.user.id,
           firstName: res.user.first_name,
@@ -51,10 +60,15 @@ export class AuthService {
           driverId: res.user.driver_id,
           passwordIsDefault: res.user.password_is_default
         };
-        localStorage.setItem('moni_token', res.token);
-        localStorage.setItem('moni_user', JSON.stringify(user));
+
+        // 2. STOCKAGE CRITIQUE : On utilise 'moni_token'
+        localStorage.setItem(this.TOKEN_KEY, res.token);
+        localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+
+        // 3. Mise à jour de l'état de l'application
         this._user.set(user);
-        // Redirection selon le rôle
+
+        // 4. Redirection
         if (user.role === 'driver') {
           this.router.navigate(['/trips']);
         } else {
@@ -65,37 +79,36 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('moni_token');
-    localStorage.removeItem('moni_user');
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USER_KEY);
     this._user.set(null);
     this.router.navigate(['/login']);
   }
 
+  getToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
+  }
+
+  // --- Autres méthodes (me, updateProfile, etc.) ---
   me(): Observable<User> {
     return this.http.get<User>(`${this.api}/me`).pipe(
-      tap(u => { localStorage.setItem('moni_user', JSON.stringify(u)); this._user.set(u); })
+      tap(u => {
+        localStorage.setItem(this.USER_KEY, JSON.stringify(u));
+        this._user.set(u);
+      })
     );
   }
 
   updateProfile(data: Partial<User>): Observable<any> {
     return this.http.put(`${this.api}/profile`, data).pipe(
-      tap(() => { const u = { ...this._user()!, ...data }; localStorage.setItem('moni_user', JSON.stringify(u)); this._user.set(u); })
-    );
-  }
-
-  changePassword(current_password: string, new_password: string): Observable<any> {
-    return this.http.put(`${this.api}/password`, { current_password, new_password }).pipe(
       tap(() => {
-        // Mettre à jour le flag passwordIsDefault
-        const u = this._user();
-        if (u) {
-          u.passwordIsDefault = false;
-          localStorage.setItem('moni_user', JSON.stringify(u));
-          this._user.set(u);
+        const current = this._user();
+        if (current) {
+          const updated = { ...current, ...data };
+          localStorage.setItem(this.USER_KEY, JSON.stringify(updated));
+          this._user.set(updated);
         }
       })
     );
   }
-
-  getToken(): string | null { return localStorage.getItem('moni_token'); }
 }

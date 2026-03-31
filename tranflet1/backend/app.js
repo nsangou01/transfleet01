@@ -3,13 +3,13 @@ const express    = require('express');
 const helmet     = require('helmet');
 const cors       = require('cors');
 const morgan     = require('morgan');
-const rateLimit  = require('express-rate-limit');
 const path       = require('path');
-const routes     = require('./routes');
+const routes     = require('./routes'); // Importe votre index.js des routes
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
+// Configuration de la sécurité et des accès
 app.use(helmet());
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:4200',
@@ -18,17 +18,23 @@ app.use(cors({
   allowedHeaders: ['Content-Type','Authorization'],
 }));
 
-app.use('/api/auth/login', rateLimit({ windowMs: 15*60*1000, max: 10,
-  message: { message: 'Trop de tentatives. Réessayez dans 15 minutes.' } }));
-app.use('/api', rateLimit({ windowMs: 60*1000, max: 300 }));
-
+// Lecture des données JSON
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
 if (process.env.NODE_ENV !== 'test') app.use(morgan('dev'));
+
+// Dossier public pour les images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Chargement des routes API
 app.use('/api', routes);
+
+// Santé de l'API
 app.get('/health', (_req, res) => res.json({ status:'ok', service:'TRANSFLET API', ts: new Date() }));
+
+// Gestion des erreurs
 app.use((_req, res) => res.status(404).json({ message: 'Route introuvable' }));
 app.use(errorHandler);
 
-module.exports = app;
+module.exports = app; // INDISPENSABLE pour server.js
