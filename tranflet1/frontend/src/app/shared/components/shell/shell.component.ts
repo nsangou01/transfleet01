@@ -30,14 +30,13 @@ export class ShellComponent implements OnInit {
   });
 
   navItems: NavItem[] = [
-    { label: 'Tableau de bord', route: '/dashboard' },
+    { label: 'Tableau de bord', route: '/dashboard', managerOnly: true },
     { label: 'Véhicules',       route: '/vehicles',      managerOnly: true },
     { label: 'Conducteurs',     route: '/drivers',       managerOnly: true },
     { label: 'Trajets',         route: '/trips' },
     { label: 'Carburant',       route: '/fuel',          managerOnly: true },
     { label: 'Maintenance',     route: '/maintenance',   managerOnly: true },
     { label: 'Suivi GPS',       route: '/tracking',      managerOnly: true },
-    { label: 'Notifications',   route: '/notifications' },
     // La ligne des rapports a été mise en commentaire juste en dessous :
     // { label: 'Rapports',        route: '/reports',       managerOnly: true },
   ];
