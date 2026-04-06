@@ -1,11 +1,15 @@
 'use strict';
 const { Op, Sequelize, fn, col, literal } = require('sequelize');
-const { Vehicle, Driver, Trip, Fuel, Maintenance, User, Tracking } = require('../models');
+const db = require('../models');
 
 exports.dashboard = async (req, res, next) => {
   try {
-    const { from_date, to_date } = req.query;
-    const dateFilter = {};
+    // Utilisation de l'objet db pour éviter les erreurs d'import
+    const Vehicle = db.Vehicle || db.vehicles;
+    const Driver = db.Driver || db.drivers;
+    const Trip = db.Trip || db.trips;
+    const Fuel = db.Fuel || db.fuels;
+    const Maintenance = db.Maintenance || db.maintenances;
 
     if (from_date || to_date) {
       dateFilter.created_at = {};

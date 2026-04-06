@@ -38,7 +38,8 @@ export class ShellComponent implements OnInit {
     { label: 'Maintenance',     route: '/maintenance',   managerOnly: true },
     { label: 'Suivi GPS',       route: '/tracking',      managerOnly: true },
     { label: 'Notifications',   route: '/notifications' },
-    { label: 'Rapports',        route: '/reports',       managerOnly: true },
+    // La ligne des rapports a été mise en commentaire juste en dessous :
+    // { label: 'Rapports',        route: '/reports',       managerOnly: true },
   ];
 
   visibleItems = computed(() =>

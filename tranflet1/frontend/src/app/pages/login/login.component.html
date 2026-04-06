@@ -1,8 +1,10 @@
 <div class="login-page">
   <div class="login-card">
     <div class="login-header">
-      <div class="logo">LOGO</div>
-      <h1>TRANSFLET</h1>
+      <div class="logo">
+        <img src="logo.jpg" alt="TRANSFLEET Logo">
+      </div>
+      <h1>TRANSFLEET</h1>
       <p>Système de Gestion de Flotte<br><strong>TRANSIMEX S.A</strong></p>
     </div>
 
@@ -22,7 +24,9 @@
         <div class="input-pw">
           <input [type]="showPw() ? 'text' : 'password'" [(ngModel)]="password"
                  name="password" placeholder="••••••••" required autocomplete="current-password" />
-          <button type="button" class="pw-toggle" (click)="showPw.update(v => !v)">{{ showPw() ? 'Masquer' : 'Voir' }}</button>
+          <button type="button" class="pw-toggle" (click)="showPw.update(v => !v)">
+            {{ showPw() ? 'Masquer' : 'Voir' }}
+          </button>
         </div>
       </div>
 

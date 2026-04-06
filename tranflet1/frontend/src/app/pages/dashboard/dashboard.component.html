@@ -12,10 +12,9 @@
   }
 
   @if (stats(); as s) {
-    <!-- KPI Cards -->
     <div class="kpi-grid">
       <div class="kpi-card">
-        <div class="kpi-icon vehicles"></div>
+        <div class="kpi-icon vehicles">🚗</div>
         <div class="kpi-body">
           <div class="kpi-value">{{ s.vehicles.total }}</div>
           <div class="kpi-label">Véhicules totaux</div>
@@ -28,7 +27,7 @@
       </div>
 
       <div class="kpi-card">
-        <div class="kpi-icon drivers"></div>
+        <div class="kpi-icon drivers">👨‍✈️</div>
         <div class="kpi-body">
           <div class="kpi-value">{{ s.drivers.total }}</div>
           <div class="kpi-label">Conducteurs</div>
@@ -40,7 +39,7 @@
       </div>
 
       <div class="kpi-card">
-        <div class="kpi-icon trips"></div>
+        <div class="kpi-icon trips">🛣️</div>
         <div class="kpi-body">
           <div class="kpi-value">{{ s.trips.total }}</div>
           <div class="kpi-label">Trajets totaux</div>
@@ -52,7 +51,7 @@
       </div>
 
       <div class="kpi-card">
-        <div class="kpi-icon fuel"></div>
+        <div class="kpi-icon fuel">⛽</div>
         <div class="kpi-body">
           <div class="kpi-value">{{ s.fuel?.monthCost ? (s.fuel.monthCost / 1000 | number:'1.0-0') : 0 }}K</div>
           <div class="kpi-label">Coût carburant (FCFA)</div>
@@ -63,7 +62,6 @@
       </div>
     </div>
 
-    <!-- Maintenance alerts -->
     @if (s.maintenance.pending > 0) {
       <div class="section">
         <div class="section-header">
@@ -85,30 +83,14 @@
       </div>
     }
 
-    <!-- Quick actions -->
     <div class="section">
       <h2>Actions rapides</h2>
       <div class="quick-actions">
-        <a routerLink="/trips" class="action-card">
-          <span>Nouveau trajet</span>
-        </a>
-        <a routerLink="/vehicles" class="action-card">
-          <span>Gérer les véhicules</span>
-        </a>
-        <a routerLink="/fuel" class="action-card">
-          <span>Saisir carburant</span>
-        </a>
-        <a routerLink="/notifications" class="action-card">
-          <span>Notifications</span>
-        </a>
+        <a routerLink="/trips" class="action-card"><span>Nouveau trajet</span></a>
+        <a routerLink="/vehicles" class="action-card"><span>Gérer les véhicules</span></a>
+        <a routerLink="/fuel" class="action-card"><span>Saisir carburant</span></a>
+        <a routerLink="/notifications" class="action-card"><span>Notifications</span></a>
       </div>
-    </div>
-  }
-
-  @if (error()) {
-    <div class="error-state">
-      {{ error() }}
-      <button class="btn btn-secondary" (click)="load()">Réessayer</button>
     </div>
   }
 </div>

@@ -26,7 +26,7 @@ export class AuthService {
   private router = inject(Router);
   private api    = `${environment.apiUrl}/auth`;
 
-  // Utilisation des clés constantes pour éviter les erreurs de frappe
+  // Utilisation des clés constantes pour le LocalStorage
   private readonly TOKEN_KEY = 'moni_token';
   private readonly USER_KEY  = 'moni_user';
 
@@ -49,7 +49,7 @@ export class AuthService {
   login(email: string, password: string): Observable<ApiLoginResponse> {
     return this.http.post<ApiLoginResponse>(`${this.api}/login`, { email, password }).pipe(
       tap(res => {
-        // 1. On prépare l'objet User (mapping snake_case vers camelCase)
+        // Mapping manuel pour s'assurer que les noms correspondent à ton interface User.ts
         const user: User = {
           id: res.user.id,
           firstName: res.user.first_name,
@@ -58,21 +58,38 @@ export class AuthService {
           role: res.user.role,
           phone: res.user.phone,
           driverId: res.user.driver_id,
-          passwordIsDefault: res.user.password_is_default
+          passwordIsDefault: res.user.password_is_default || false
         };
 
-        // 2. STOCKAGE CRITIQUE : On utilise 'moni_token'
+        // Stockage
         localStorage.setItem(this.TOKEN_KEY, res.token);
         localStorage.setItem(this.USER_KEY, JSON.stringify(user));
 
-        // 3. Mise à jour de l'état de l'application
+        // Mise à jour de l'état
         this._user.set(user);
 
-        // 4. Redirection
+        // Redirection intelligente
         if (user.role === 'driver') {
           this.router.navigate(['/trips']);
         } else {
           this.router.navigate(['/dashboard']);
+        }
+      })
+    );
+  }
+
+  /**
+   * MÉTHODE CORRIGÉE : Indispensable pour ton composant force-password-change
+   */
+  changePassword(current_password: string, new_password: string): Observable<any> {
+    return this.http.put(`${this.api}/password`, { current_password, new_password }).pipe(
+      tap(() => {
+        const u = this._user();
+        if (u) {
+          // On met à jour l'utilisateur localement pour dire que le MDP n'est plus par défaut
+          const updatedUser: User = { ...u, passwordIsDefault: false };
+          localStorage.setItem(this.USER_KEY, JSON.stringify(updatedUser));
+          this._user.set(updatedUser);
         }
       })
     );
@@ -89,7 +106,6 @@ export class AuthService {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  // --- Autres méthodes (me, updateProfile, etc.) ---
   me(): Observable<User> {
     return this.http.get<User>(`${this.api}/me`).pipe(
       tap(u => {

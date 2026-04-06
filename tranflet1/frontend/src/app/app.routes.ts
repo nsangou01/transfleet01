@@ -18,7 +18,8 @@ export const routes: Routes = [
       { path: 'maintenance',   canActivate: [managerGuard], loadComponent: () => import('./pages/maintenance/maintenance.component').then(m => m.MaintenanceComponent) },
       { path: 'tracking',      canActivate: [managerGuard], loadComponent: () => import('./pages/tracking/tracking.component').then(m => m.TrackingComponent) },
       { path: 'notifications', loadComponent: () => import('./pages/notifications/notifications.component').then(m => m.NotificationsComponent) },
-      { path: 'reports',       canActivate: [managerGuard], loadComponent: () => import('./pages/reports/reports.component').then(m => m.ReportsComponent) },
+      // La route des rapports est désactivée ci-dessous :
+      // { path: 'reports',        canActivate: [managerGuard], loadComponent: () => import('./pages/reports/reports.component').then(m => m.ReportsComponent) },
     ],
   },
   { path: '**', loadComponent: () => import('./pages/not-found/not-found.component').then(m => m.NotFoundComponent) },

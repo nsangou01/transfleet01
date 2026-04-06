@@ -1,6 +1,6 @@
 'use strict';
 const bcrypt = require('bcryptjs');
-const jwt    = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const { User, Driver } = require('../models');
 
 const sign = (user) => {
@@ -8,12 +8,11 @@ const sign = (user) => {
   return jwt.sign(
     { id: user.id, role: user.role },
     secret,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
+    { expiresIn: '8h' }
   );
 };
 
 exports.login = async (req, res, next) => {
-  console.log("==> Tentative de login pour :", req.body.email);
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ where: { email: email?.toLowerCase().trim() } });
@@ -46,7 +45,3 @@ exports.login = async (req, res, next) => {
     });
   } catch (err) { next(err); }
 };
-
-exports.me = async (req, res, next) => { /* votre code me ... */ };
-exports.changePassword = async (req, res, next) => { /* votre code changePassword ... */ };
-exports.updateProfile = async (req, res, next) => { /* votre code updateProfile ... */ };
