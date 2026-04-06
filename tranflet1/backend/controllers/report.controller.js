@@ -57,17 +57,33 @@ exports.dashboard = async (req, res, next) => {
       raw: true,
     });
 
-    const [fuelStats] = await Fuel.findAll({
-      where: from_date || to_date ? {
+    // Statistiques du carburant - mois courant
+    const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const todayStr = today.toISOString().split('T')[0];
+
+    const [monthFuelStats] = await Fuel.findAll({
+      where: {
         date: {
-          ...(from_date && { [Op.gte]: from_date }),
-          ...(to_date && { [Op.lte]: to_date })
+          [Op.gte]: firstDayOfMonth.toISOString().split('T')[0],
+          [Op.lte]: todayStr
         }
-      } : {},
+      },
       attributes: [
         [fn('SUM', col('quantity')), 'total_quantity'],
-        [fn('SUM', col('total_cost')), 'total_cost'],
+        [fn('SUM', col('total_cost')), 'monthCost'],
         [fn('AVG', col('price_per_litre')), 'avg_price_per_litre'],
+      ],
+      raw: true,
+    });
+
+    // Statistiques du carburant - aujourd'hui
+    const [todayFuelStats] = await Fuel.findAll({
+      where: {
+        date: todayStr
+      },
+      attributes: [
+        [fn('SUM', col('total_cost')), 'todayCost'],
       ],
       raw: true,
     });
@@ -88,7 +104,12 @@ exports.dashboard = async (req, res, next) => {
       vehicles: vehicleStats,
       drivers: driverStats,
       trips: tripStats,
-      fuel: fuelStats,
+      fuel: {
+        monthCost: parseFloat(monthFuelStats?.monthCost || 0),
+        todayCost: parseFloat(todayFuelStats?.todayCost || 0),
+        total_quantity: parseFloat(monthFuelStats?.total_quantity || 0),
+        avg_price_per_litre: parseFloat(monthFuelStats?.avg_price_per_litre || 0),
+      },
       maintenance: maintenanceStats,
     });
   } catch (error) {
